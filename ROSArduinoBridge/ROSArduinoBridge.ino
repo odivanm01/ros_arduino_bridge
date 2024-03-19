@@ -62,8 +62,12 @@
    /* Encoders directly attached to Arduino board */
    #define ARDUINO_ENC_COUNTER
 
-   /* L298 Motor driver*/
-   #define L298_MOTOR_DRIVER
+   /* L298 Motor drive */
+   // #define L298_MOTOR_DRIVER
+
+   /* MAXON */
+   #define MAXON_MOTOR_DRIVER
+   
 #endif
 
 //#define USE_SERVOS  // Enable use of PWM servos as defined in servos.h
@@ -333,26 +337,26 @@ void loop() {
     }
   }
   
-// If we are using base control, run a PID calculation at the appropriate intervals
-#ifdef USE_BASE
-  if (millis() > nextPID) {
-    updatePID();
-    nextPID += PID_INTERVAL;
-  }
-  
-  // Check to see if we have exceeded the auto-stop interval
-  if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {;
-    setMotorSpeeds(0, 0);
-    moving = 0;
-  }
-#endif
+  // // If we are using base control, run a PID calculation at the appropriate intervals
+  // #ifdef USE_BASE
+  //   if (millis() > nextPID) {
+  //     updatePID();
+  //     nextPID += PID_INTERVAL;
+  //   }
+    
+  //   // Check to see if we have exceeded the auto-stop interval
+  //   if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {;
+  //     setMotorSpeeds(0, 0);
+  //     moving = 0;
+  //   }
+  // #endif
 
-// Sweep servos
-#ifdef USE_SERVOS
-  int i;
-  for (i = 0; i < N_SERVOS; i++) {
-    servos[i].doSweep();
-  }
-#endif
+  // Sweep servos
+  #ifdef USE_SERVOS
+    int i;
+    for (i = 0; i < N_SERVOS; i++) {
+      servos[i].doSweep();
+    }
+  #endif
 }
 
