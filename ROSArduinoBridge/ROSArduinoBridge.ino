@@ -143,11 +143,14 @@ long arg1;
 long arg2;
 
 // Variables used for the RPM reading
-const int nb_samples = 20;
-const float alpha = 0.01; // Exponential filter factor (adjust as needed)
+// const int nb_samples = 20;
+// const float alpha = 0.01; // Exponential filter factor (adjust as needed)
 
-float ema_l = 0.0; // Exponential moving average
-float ema_r = 0.0; // Exponential moving average
+// float ema_l = 0.0; // Exponential moving average
+// float ema_r = 0.0; // Exponential moving average
+
+float current_speed_l = 0;
+float current_speed_r = 0;
 
 /* Clear the current command parameters */
 void resetCommand() {
@@ -176,24 +179,9 @@ int runCommand() {
   case ANALOG_READ:
     // Serial.println(analogRead(arg1));
 
-    // Serial.print("Avg Speed   LEFT:  ");
-    // Serial.print((((analogRead(A1) * 5.0)/1024.0)*5000.0)/4.0);
-    // Serial.println(" RPM");
-    // Serial.print("Avg Speed   RIGHT:  ");
-    // Serial.print((((analogRead(A3) * 5.0)/1024.0)*5000.0)/4.0);
-    // Serial.println(" RPM");
-
-    Serial.print(int(ema_l));
+    Serial.print(current_speed_l);
     Serial.print(" ");
-    Serial.println(int(ema_r));
-
-    // Serial.print((analogRead(A1) * 5.00)/1023.00);
-    // Serial.print(" ");
-    // Serial.println((analogRead(A3) * 5.00)/1023.00);
-
-    // Serial.print(((analogRead(A1) * 5.0)/1024.0));
-    // Serial.print(" ");
-    // Serial.println(((analogRead(A3) * 5.0)/1024.0));
+    Serial.println(current_speed_r);
 
     break;
   case DIGITAL_READ:
@@ -242,6 +230,8 @@ int runCommand() {
     lastMotorCommand = millis();
     if (arg1 == 0 && arg2 == 0) {
       setMotorSpeeds(0, 0);
+      current_speed_l = 0;
+      current_speed_r = 0; 
       resetPID();
       moving = 0;
     }
@@ -256,6 +246,10 @@ int runCommand() {
     resetPID();
     moving = 0; // Sneaky way to temporarily disable the PID
     setMotorSpeeds(arg1, arg2);
+    current_speed_l = arg1;
+    current_speed_r = arg2; 
+    
+
     Serial.println("OK"); 
     break;
   case UPDATE_PID:
@@ -328,38 +322,38 @@ void loop() {
   // int LEFT_VOLTAGE = ((analogRead(A3) * 5.0)/1023.0);
   // int RIGHT_VOLTAGE = ((analogRead(A1) * 5.0)/1023.0);
 
-  int RPM_LEFT_READING = 0;
-  int RPM_RIGHT_READING = 0;
+  // int RPM_LEFT_READING = 0;
+  // int RPM_RIGHT_READING = 0;
 
-  if (analogRead(A3) > 610) {
-    RPM_LEFT_READING   = ((((analogRead(A3) * 5.0)/1023.0)+(0.09*((analogRead(A3) * 5.0)/1023.0)/3.91))*4500.0)/4; // LEFT MOTOR
-  } 
-  else if (analogRead(A3) > 410) {
-    RPM_LEFT_READING   = ((((analogRead(A3) * 5.0)/1023.0)+(0.112*((analogRead(A3) * 5.0)/1023.0)/3.91))*4500.0)/4; // LEFT MOTOR
-  } 
-  else if (analogRead(A3) > 110) {
-    RPM_LEFT_READING   = ((((analogRead(A3) * 5.0)/1023.0)+(0.12*((analogRead(A3) * 5.0)/1023.0)/3.91))*4500.0)/4; // LEFT MOTOR
-  }
-  else {
-    RPM_LEFT_READING   = ((((analogRead(A3) * 5.0)/1023.0)+(0.75*((analogRead(A3) * 5.0)/1023.0)/3.91))*4500.0)/4; // LEFT MOTOR
-  }
+  // if (analogRead(A3) > 610) {
+  //   RPM_LEFT_READING   = ((((analogRead(A3) * 5.0)/1023.0)+(0.09*((analogRead(A3) * 5.0)/1023.0)/3.91))*4500.0)/4; // LEFT MOTOR
+  // } 
+  // else if (analogRead(A3) > 410) {
+  //   RPM_LEFT_READING   = ((((analogRead(A3) * 5.0)/1023.0)+(0.112*((analogRead(A3) * 5.0)/1023.0)/3.91))*4500.0)/4; // LEFT MOTOR
+  // } 
+  // else if (analogRead(A3) > 110) {
+  //   RPM_LEFT_READING   = ((((analogRead(A3) * 5.0)/1023.0)+(0.12*((analogRead(A3) * 5.0)/1023.0)/3.91))*4500.0)/4; // LEFT MOTOR
+  // }
+  // else {
+  //   RPM_LEFT_READING   = ((((analogRead(A3) * 5.0)/1023.0)+(0.75*((analogRead(A3) * 5.0)/1023.0)/3.91))*4500.0)/4; // LEFT MOTOR
+  // }
 
-  if (analogRead(A1) > 610) {
-    RPM_RIGHT_READING  = ((((analogRead(A1) * 5.0)/1023.0)+(0.09*((analogRead(A1) * 5.0)/1023.0)/3.91))*4500.0)/4; // RIGHT MOTOR
-  } 
-  else if (analogRead(A1) > 410) {
-    RPM_RIGHT_READING  = ((((analogRead(A1) * 5.0)/1023.0)+(0.112*((analogRead(A1) * 5.0)/1023.0)/3.91))*4500.0)/4; // RIGHT MOTOR
-  } 
-  else if (analogRead(A1) > 110) {
-    RPM_RIGHT_READING  = ((((analogRead(A1) * 5.0)/1023.0)+(0.12*((analogRead(A1) * 5.0)/1023.0)/3.91))*4500.0)/4; // RIGHT MOTOR
-  }
-  else {
-    RPM_RIGHT_READING  = ((((analogRead(A1) * 5.0)/1023.0)+(0.75*((analogRead(A1) * 5.0)/1023.0)/3.91))*4500.0)/4; // RIGHT MOTOR
-  }
+  // if (analogRead(A1) > 610) {
+  //   RPM_RIGHT_READING  = ((((analogRead(A1) * 5.0)/1023.0)+(0.09*((analogRead(A1) * 5.0)/1023.0)/3.91))*4500.0)/4; // RIGHT MOTOR
+  // } 
+  // else if (analogRead(A1) > 410) {
+  //   RPM_RIGHT_READING  = ((((analogRead(A1) * 5.0)/1023.0)+(0.112*((analogRead(A1) * 5.0)/1023.0)/3.91))*4500.0)/4; // RIGHT MOTOR
+  // } 
+  // else if (analogRead(A1) > 110) {
+  //   RPM_RIGHT_READING  = ((((analogRead(A1) * 5.0)/1023.0)+(0.12*((analogRead(A1) * 5.0)/1023.0)/3.91))*4500.0)/4; // RIGHT MOTOR
+  // }
+  // else {
+  //   RPM_RIGHT_READING  = ((((analogRead(A1) * 5.0)/1023.0)+(0.75*((analogRead(A1) * 5.0)/1023.0)/3.91))*4500.0)/4; // RIGHT MOTOR
+  // }
 
-  // Calculate EMA
-  ema_l = alpha * RPM_LEFT_READING + (1 - alpha) * ema_l;
-  ema_r = alpha * RPM_RIGHT_READING + (1 - alpha) * ema_r;
+  // // Calculate EMA
+  // ema_l = alpha * RPM_LEFT_READING + (1 - alpha) * ema_l;
+  // ema_r = alpha * RPM_RIGHT_READING + (1 - alpha) * ema_r;
 
   while (Serial.available() > 0) {
     
@@ -403,14 +397,16 @@ void loop() {
   
   // // If we are using base control, run a PID calculation at the appropriate intervals
   // #ifdef USE_BASE
-  //   if (millis() > nextPID) {
-  //     updatePID();
-  //     nextPID += PID_INTERVAL;
-  //   }
+  // //   if (millis() > nextPID) {
+  // //     updatePID();
+  // //     nextPID += PID_INTERVAL;
+  // //   }
     
   //   // Check to see if we have exceeded the auto-stop interval
   //   if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {;
   //     setMotorSpeeds(0, 0);
+  //     current_speed_l = 0;
+  //     current_speed_r = 0;
   //     moving = 0;
   //   }
   // #endif

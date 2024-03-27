@@ -19,12 +19,15 @@
   void setMotorSpeed(int i, int spd) {
     unsigned char reverse = 0;
 
-    spd = map(spd, 0, 4500, 25.5, 229.5);
-  
-    if (spd < 0)
+    if (spd > 0)
+    { 
+      spd = map(spd, 0, 4500, 25.5, 229.5);
+    }
+    else if (spd < 0)
     { 
       spd = -spd;
       reverse = 1;
+      spd = map(spd, 0, 4500, 25.5, 229.5);
     }
     if (spd > 230)
       spd = 253; // 253 MAX
