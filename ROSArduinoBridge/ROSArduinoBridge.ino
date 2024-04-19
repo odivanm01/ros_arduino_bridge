@@ -297,6 +297,10 @@ void setup() {
     // enable PCINT1 and PCINT2 interrupt in the general interrupt mask
     PCICR |= (1 << PCIE1) | (1 << PCIE2);
   #endif
+  // pinMode(2, OUTPUT);
+  // pinMode(3, OUTPUT);
+  // pinMode(4, OUTPUT);
+  // pinMode(11, OUTPUT);
   initMotorController();
   resetPID();
 #endif
@@ -313,11 +317,30 @@ void setup() {
   #endif
 }
 
+void current_sense()                  // current sense and diagnosis
+{
+  int val_L=analogRead(A0);
+  int val_R=analogRead(A1);
+
+  if(val_L > 45 || val_R > 40){
+    counter_L++;
+    if(counter_L==3){
+      counter_L=0;
+    }
+  }
+}
+
 /* Enter the main loop.  Read and parse input from the serial port
    and run any valid commands. Run a PID calculation at the target
    interval and check for auto-stop conditions.
 */
 void loop() {
+
+  static unsigned long timePoint = 0;    // current sense and diagnosis,if you want to use this
+  if(millis() - timePoint > 200){       //function,please show it & don't forget to connect the IS pins to Arduino
+    current_sense();
+    timePoint = millis();
+  }
 
   // int LEFT_VOLTAGE = ((analogRead(A3) * 5.0)/1023.0);
   // int RIGHT_VOLTAGE = ((analogRead(A1) * 5.0)/1023.0);
@@ -395,21 +418,21 @@ void loop() {
     }
   }
   
-  // // If we are using base control, run a PID calculation at the appropriate intervals
-  // #ifdef USE_BASE
-  // //   if (millis() > nextPID) {
-  // //     updatePID();
-  // //     nextPID += PID_INTERVAL;
-  // //   }
-    
-  //   // Check to see if we have exceeded the auto-stop interval
-  //   if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {;
-  //     setMotorSpeeds(0, 0);
-  //     current_speed_l = 0;
-  //     current_speed_r = 0;
-  //     moving = 0;
+  // If we are using base control, run a PID calculation at the appropriate intervals
+  #ifdef USE_BASE
+  //   if (millis() > nextPID) {
+  //     updatePID();
+  //     nextPID += PID_INTERVAL;
   //   }
-  // #endif
+    
+    // Check to see if we have exceeded the auto-stop interval
+    if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {;
+      setMotorSpeeds(0, 0);
+      current_speed_l = 0;
+      current_speed_r = 0;
+      moving = 0;
+    }
+  #endif
 
   // Sweep servos
   #ifdef USE_SERVOS

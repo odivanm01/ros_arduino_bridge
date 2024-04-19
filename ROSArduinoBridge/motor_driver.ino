@@ -56,6 +56,20 @@
   }
   
   void setMotorSpeeds(int leftSpeed, int rightSpeed) {
+    // if (leftSpeed < 0 & rightSpeed < 0){
+    //   analogWrite (RIGHT_SWEEPER_MOVE,145);    
+    //   digitalWrite(RIGHT_SWEEPER_DIRECTION,LOW);
+    //   analogWrite (LEFT_SWEEPER_MOVE,150);
+    //   digitalWrite(LEFT_SWEEPER_DIRECTION,HIGH);
+    // } else if (leftSpeed == 0 & rightSpeed == 0) {
+    //   analogWrite (RIGHT_SWEEPER_MOVE,0);     
+    //   analogWrite (LEFT_SWEEPER_MOVE,0);
+    // } else {
+    //   analogWrite (RIGHT_SWEEPER_MOVE,145);
+    //   digitalWrite(RIGHT_SWEEPER_DIRECTION,HIGH);
+    //   analogWrite (LEFT_SWEEPER_MOVE,150);
+    //   digitalWrite(LEFT_SWEEPER_DIRECTION,LOW);
+    // }
     setMotorSpeed(LEFT, leftSpeed);
     setMotorSpeed(RIGHT, rightSpeed);
   }
