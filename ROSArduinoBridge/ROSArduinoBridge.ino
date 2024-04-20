@@ -316,7 +316,7 @@ void loop() {
       counter = 0;
       lastSweeperProblem = millis();
     } // Stop the reverse process after a moment
-    if (sweeper_blocked & (millis() - lastSweeperReverse) > SWEEPER_REVERSE_TIME) {  
+    if (sweeper_blocked && (millis() - lastSweeperReverse) > SWEEPER_REVERSE_TIME) {  
       sweeper_blocked= false;
       stopSweeper();
     }

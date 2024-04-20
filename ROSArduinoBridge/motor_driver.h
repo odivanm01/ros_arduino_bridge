@@ -12,6 +12,10 @@
   #define LEFT_MOTOR_ENABLE 9
   #define LEFT_MOTOR_DIRECTION 10
 
+  #define MAX_PWM 229.5
+  #define MIN_PWM 25.5
+  #define MAX_SPEED 4500
+
   void initMotorController();
   void setMotorSpeed(int i, int spd);
   void setMotorSpeeds(int leftSpeed, int rightSpeed);
@@ -23,10 +27,14 @@
   #define RIGHT_SWEEPER_MOVE 3 // M2 motor (RIGHT)
   #define RIGHT_SWEEPER_DIRECTION 11 
   #define RIGHT_SWEEPER_IS A1 
+  #define RIGHT_SWEEPER_SPEED 145
+  #define RIGHT_SWEEPER_REVERSE_SPEED 100
   
   #define LEFT_SWEEPER_MOVE 4 // M1 motor (LEFT)
   #define LEFT_SWEEPER_DIRECTION 2
   #define LEFT_SWEEPER_IS A0
+  #define LEFT_SWEEPER_SPEED 150
+  #define LEFT_SWEEPER_REVERSE_SPEED 105
 
   bool sweeper_blocked;
 
