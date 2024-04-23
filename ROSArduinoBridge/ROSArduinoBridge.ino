@@ -131,6 +131,11 @@ int counter = 0;
 float current_speed_l = 0;
 float current_speed_r = 0;
 
+enum ServoState {ROTATING_R, ROTATING_L, IDLE}; // servo state: rotating/idle
+ServoState servo_state = IDLE;
+unsigned long timerStart = 0;
+bool timerActive = false;
+
 /* Clear the current command parameters */
 void resetCommand() {
   cmd = NULL;
@@ -191,8 +196,8 @@ int runCommand() {
 
 #ifdef USE_SERVOS
   case SERVO_WRITE:
-    moveServo(arg1);
-    //turnServo(arg1, arg2);
+    turnServo(RIGHT, 100);
+    servo_state = ROTATING_R;
     Serial.println("OK");
     break;
 #endif
@@ -225,6 +230,8 @@ void setup() {
   pinMode(RIGHT_SWEEPER_DIRECTION, OUTPUT); // Digital 11
   pinMode(LEFT_SWEEPER_IS,INPUT);           // Analog 0
   pinMode(RIGHT_SWEEPER_IS,INPUT);          // Analog 1
+  pinMode(EOC_SWITCH,INPUT);                // Analog 2
+
 
   initMotorController();
 }
@@ -321,6 +328,26 @@ void loop() {
       stopSweeper();
     }
   #endif
+
+
+  if (servo_state == ROTATING_R){
+  // Check if the end-of-course switch is triggered
+    if (digitalRead(EOC_SWITCH) == 1){
+      turnServo(LEFT, 100);
+      servo_state = ROTATING_L;   // Change state to ROTATING_L
+      timerStart = millis();      // Start the timer
+      timerActive = true;         // Activate the timer
+    }
+  }
+
+  if (servo_state == ROTATING_L && timerActive) {
+    // Check if 2 seconds have passed since the timer was started
+    if (millis() - timerStart >= 2000) {
+      stopServo(); 
+      servo_state = IDLE;         // Change state to IDLE
+      timerActive = false;        // Deactivate the timer
+    }
+  }
 }
 
 // Code to put in loop() if we want to use the Maxon motors in closed loop

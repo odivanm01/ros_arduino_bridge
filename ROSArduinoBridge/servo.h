@@ -1,6 +1,7 @@
 #ifdef USE_SERVOS
 
 #define N_SERVOS 1
+#define EOC_SWITCH A2
 
 #define DirectionPin  (10u)
 #define BaudRate    (1000000ul)
