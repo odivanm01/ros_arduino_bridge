@@ -6,13 +6,13 @@
 
 void moveServo(int val)          //Move servo to given position
 {
-    ax12a.setEndless(SERVO_ID, 1);     //0 = Joint mode, 1 = Wheel mode
+    ax12a.setEndless(SERVO_ID, 0);     //0 = Joint mode, 1 = Wheel mode
     ax12a.move(SERVO_ID, val);
     Serial.println(val);
 }
-void turnServo(int val)          //Turn servo in one direction
+void turnServo(bool direction, int val)          //Turn servo in one direction
 {   
-    ax12a.setEndless(SERVO_ID, 0);     //0 = Joint mode, 1 = Wheel mode
+    ax12a.setEndless(SERVO_ID, 1);     //0 = Joint mode, 1 = Wheel mode
     ax12a.turn(SERVO_ID, LEFT, val);
     Serial.println(val);
 }

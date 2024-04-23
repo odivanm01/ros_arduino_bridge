@@ -72,7 +72,7 @@
 
   /* Stop the robot if it hasn't received a movement command
   in this number of milliseconds */
-  #define AUTO_STOP_INTERVAL 500
+  #define AUTO_STOP_INTERVAL 1000
 
   long lastMotorCommand = AUTO_STOP_INTERVAL;
 
@@ -94,7 +94,7 @@
 
   /* Stop the sweepers if the robot hasn't received a movement command
     in this number of milliseconds */
-  #define AUTO_STOP_SWEEPERS_INTERVAL 1500
+  #define AUTO_STOP_SWEEPERS_INTERVAL 2000
 
   /* Reset the sweepers counter if they haven't had a problem
     in this number of milliseconds */
