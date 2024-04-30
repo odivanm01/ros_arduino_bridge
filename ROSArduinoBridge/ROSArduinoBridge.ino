@@ -53,7 +53,7 @@
 //#undef USE_SWEEPERS // Comment this line out if you want to use the sweepers
 
 /* Serial port baud rate */
-#define BAUDRATE     1000000
+#define BAUDRATE     57600
 
 /* Include the Arduino standard libraries */
 #if defined(ARDUINO) && ARDUINO >= 100
@@ -133,6 +133,8 @@ float current_speed_r = 0;
 
 enum ServoState {ROTATING_R, ROTATING_L, IDLE}; // servo state: rotating/idle
 ServoState servo_state = IDLE;
+bool ServoUp = false;
+bool ServoDown = true;
 unsigned long timerStart = 0;
 bool timerActive = false;
 
@@ -196,9 +198,16 @@ int runCommand() {
 
 #ifdef USE_SERVOS
   case SERVO_WRITE:
-    turnServo(RIGHT, 100);
-    servo_state = ROTATING_R;
-    Serial.println("OK");
+    if (arg1 == 1) {
+      servo_state = ROTATING_L;
+      Serial.println("OK");
+    } else if (arg1 == 0) {
+      servo_state = ROTATING_R;
+      Serial.println("OK");
+    } else {
+      servo_state = IDLE;
+      Serial.println("OK");
+    }    
     break;
 #endif
 
@@ -330,25 +339,40 @@ void loop() {
   #endif
 
 
-  if (servo_state == ROTATING_R){
-  // Check if the end-of-course switch is triggered
-    if (digitalRead(EOC_SWITCH) == 1){
-      turnServo(LEFT, 100);
-      servo_state = ROTATING_L;   // Change state to ROTATING_L
+  if (servo_state == ROTATING_L){
+    if (!ServoUp){
+      turnServo(LEFT, 500);
+    } // Check if the end-of-course switch is triggered
+    if (digitalRead(EOC_SWITCH) == 0){
+      stopServo();
+      ServoUp = true; // Prevent the servo from breaking the EOC switch
+      ServoDown = false;
+      servo_state = IDLE;
+    }
+  }
+  if (servo_state == ROTATING_R) {
+    if (!timerActive && !ServoDown){
+      ServoUp = false;
       timerStart = millis();      // Start the timer
       timerActive = true;         // Activate the timer
     }
-  }
-
-  if (servo_state == ROTATING_L && timerActive) {
-    // Check if 2 seconds have passed since the timer was started
-    if (millis() - timerStart >= 2000) {
+    if (!ServoDown){
+      turnServo(RIGHT, 600);
+    }
+    // Check if 4.4 seconds have passed since the timer was started
+    if (millis() - timerStart >= 4400) {
+      ServoDown = true;
       stopServo(); 
       servo_state = IDLE;         // Change state to IDLE
       timerActive = false;        // Deactivate the timer
     }
   }
+  if (servo_state == IDLE) {
+    stopServo(); 
+  }
 }
+
+
 
 // Code to put in loop() if we want to use the Maxon motors in closed loop
 

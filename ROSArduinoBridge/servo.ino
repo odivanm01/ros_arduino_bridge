@@ -15,7 +15,6 @@ void turnServo(bool direction, int val)          //Turn servo in one direction
 {   
     ax12a.setEndless(SERVO_ID, 1);     //0 = Joint mode, 1 = Wheel mode
     ax12a.turn(SERVO_ID, direction, val);
-    Serial.println(val);
 }
 
 void ledServo(int val)           //Turn ON/OFF servo LED
