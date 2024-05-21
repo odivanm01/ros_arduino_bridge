@@ -287,7 +287,10 @@ void setup() {
     setupServo();
   #endif  
 
+  startTime = millis();
+
   Serial.begin(BAUDRATE);
+  Wire.begin();
 
   // Set up the MAXON and SWEEPERS pins
   pinMode(LEFT_SWEEPER_DIRECTION, OUTPUT);  // Digital 2
