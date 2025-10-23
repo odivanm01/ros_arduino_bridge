@@ -248,6 +248,7 @@ int runCommand() {
 /* Setup function--runs once at startup. */
 void setup() {
   Serial.begin(BAUDRATE);
+  setupEncoders();
 
 // Initialize the motor controller if used */
 #ifdef USE_BASE
@@ -272,7 +273,7 @@ void setup() {
     // enable PCINT1 and PCINT2 interrupt in the general interrupt mask
     PCICR |= (1 << PCIE1) | (1 << PCIE2);
   #endif
-  initMotorController();
+  /*initMotorController();*/
   resetPID();
 #endif
 

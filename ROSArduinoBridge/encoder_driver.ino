@@ -1,82 +1,70 @@
-/* *************************************************************
-   Encoder definitions
-   
-   Add an "#ifdef" block to this file to include support for
-   a particular encoder board or library. Then add the appropriate
-   #define near the top of the main ROSArduinoBridge.ino file.
-   
-   ************************************************************ */
-   
 #ifdef USE_BASE
+#ifdef ARDUINO_ENC_COUNTER
 
-#ifdef ROBOGAIA
-  /* The Robogaia Mega Encoder shield */
-  #include "MegaEncoderCounter.h"
+volatile long left_enc_pos = 0;
+volatile long right_enc_pos = 0;
 
-  /* Create the encoder shield object */
-  MegaEncoderCounter encoders = MegaEncoderCounter(4); // Initializes the Mega Encoder Counter in the 4X Count mode
-  
-  /* Wrap the encoder reading function */
-  long readEncoder(int i) {
-    if (i == LEFT) return encoders.YAxisGetCount();
-    else return encoders.XAxisGetCount();
-  }
+// estados anteriores para decodificação de quadratura
+volatile int left_last_A = 0;
+volatile int right_last_A = 0;
 
-  /* Wrap the encoder reset function */
-  void resetEncoder(int i) {
-    if (i == LEFT) return encoders.YAxisReset();
-    else return encoders.XAxisReset();
-  }
-#elif defined(ARDUINO_ENC_COUNTER)
-  volatile long left_enc_pos = 0L;
-  volatile long right_enc_pos = 0L;
-  static const int8_t ENC_STATES [] = {0,1,-1,0,-1,0,0,1,1,0,0,-1,0,-1,1,0};  //encoder lookup table
-    
-  /* Interrupt routine for LEFT encoder, taking care of actual counting */
-  ISR (PCINT2_vect){
-  	static uint8_t enc_last=0;
-        
-	enc_last <<=2; //shift previous state two places
-	enc_last |= (PIND & (3 << 2)) >> 2; //read the current state into lowest 2 bits
-  
-  	left_enc_pos += ENC_STATES[(enc_last & 0x0f)];
-  }
-  
-  /* Interrupt routine for RIGHT encoder, taking care of actual counting */
-  ISR (PCINT1_vect){
-        static uint8_t enc_last=0;
-          	
-	enc_last <<=2; //shift previous state two places
-	enc_last |= (PINC & (3 << 4)) >> 4; //read the current state into lowest 2 bits
-  
-  	right_enc_pos += ENC_STATES[(enc_last & 0x0f)];
-  }
-  
-  /* Wrap the encoder reading function */
-  long readEncoder(int i) {
-    if (i == LEFT) return left_enc_pos;
-    else return right_enc_pos;
-  }
+// pinos dos encoders (mantendo os seus)
+#define LEFT_ENC_PIN_A 3
+#define LEFT_ENC_PIN_B 18
+#define RIGHT_ENC_PIN_A 2
+#define RIGHT_ENC_PIN_B 19
 
-  /* Wrap the encoder reset function */
-  void resetEncoder(int i) {
-    if (i == LEFT){
-      left_enc_pos=0L;
-      return;
-    } else { 
-      right_enc_pos=0L;
-      return;
-    }
-  }
-#else
-  #error A encoder driver must be selected!
-#endif
+// --- Funções de interrupção ---
 
-/* Wrap the encoder reset function */
+void leftEncoderA() {
+  int A = digitalRead(LEFT_ENC_PIN_A);
+  int B = digitalRead(LEFT_ENC_PIN_B);
+  if (A == B)
+    left_enc_pos++;
+  else
+    left_enc_pos--;
+}
+
+void rightEncoderA() {
+  int A = digitalRead(RIGHT_ENC_PIN_A);
+  int B = digitalRead(RIGHT_ENC_PIN_B);
+  if (A == B)
+    right_enc_pos++;
+  else
+    right_enc_pos--;
+}
+
+// --- Inicialização dos pinos e interrupções ---
+void setupEncoders() {
+  pinMode(LEFT_ENC_PIN_A, INPUT_PULLUP);
+  pinMode(LEFT_ENC_PIN_B, INPUT_PULLUP);
+  pinMode(RIGHT_ENC_PIN_A, INPUT_PULLUP);
+  pinMode(RIGHT_ENC_PIN_B, INPUT_PULLUP);
+
+  // interrupções externas — Mega2560
+  attachInterrupt(digitalPinToInterrupt(LEFT_ENC_PIN_A), leftEncoderA, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(RIGHT_ENC_PIN_A), rightEncoderA, CHANGE);
+}
+
+// --- Leitura e reset ---
+long readEncoder(int i) {
+  if (i == LEFT)
+    return left_enc_pos;
+  else
+    return -right_enc_pos;
+}
+
+void resetEncoder(int i) {
+  if (i == LEFT)
+    left_enc_pos = 0;
+  else
+    right_enc_pos = 0;
+}
+
 void resetEncoders() {
-  resetEncoder(LEFT);
-  resetEncoder(RIGHT);
+  left_enc_pos = 0;
+  right_enc_pos = 0;
 }
 
 #endif
-
+#endif

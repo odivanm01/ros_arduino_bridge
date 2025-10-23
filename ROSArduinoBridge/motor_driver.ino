@@ -17,9 +17,9 @@
   DualVNH5019MotorShield drive;
   
   /* Wrap the motor driver initialization */
-  void initMotorController() {
+  /*void initMotorController() {
     drive.init();
-  }
+  }*/
 
   /* Wrap the drive motor set speed function */
   void setMotorSpeed(int i, int spd) {
@@ -40,9 +40,9 @@
   DualMC33926MotorShield drive;
   
   /* Wrap the motor driver initialization */
-  void initMotorController() {
+  /*void initMotorController() {
     drive.init();
-  }
+  }*/
 
   /* Wrap the drive motor set speed function */
   void setMotorSpeed(int i, int spd) {
@@ -56,10 +56,10 @@
     setMotorSpeed(RIGHT, rightSpeed);
   }
 #elif defined L298_MOTOR_DRIVER
-  void initMotorController() {
+  /*void initMotorController() {
     digitalWrite(RIGHT_MOTOR_ENABLE, HIGH);
     digitalWrite(LEFT_MOTOR_ENABLE, HIGH);
-  }
+  }*/
   
   void setMotorSpeed(int i, int spd) {
     unsigned char reverse = 0;
